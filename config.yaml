@@ -28,3 +28,8 @@ processing:
   min_area_pixels: 50000 
   # Espécie/Raça predominante para ajuste da fórmula de regressão
   breed_focus: "Nelore"
+
+  logging:
+  file_name: "logs/system.log"
+  level: "INFO" # Pode ser DEBUG, INFO, WARNING, ERROR
+  format: "%(asctime)s - %(levelname)s - %(message)s"
