@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+# detectar python disponível
+if command -v python3 >/dev/null 2>&1; then
+    PYTHON=python3
+else
+    PYTHON=python
+fi
+
+# criar venv se não existir
+if [ ! -d "venv" ]; then
+    echo "Criando venv..."
+    $PYTHON -m venv venv
+fi
+
+# corrigir caminhos (Git Bash usa estilo Linux)
+if [ -f "venv/Scripts/python.exe" ]; then
+    PY="venv/Scripts/python.exe"
+    PIP="venv/Scripts/pip.exe"
+else
+    PY="venv/bin/python"
+    PIP="venv/bin/pip"
+fi
+
+# instalar dependências
+echo "Instalando dependências..."
+$PIP install -r requirements.txt
+
+# rodar programa
+echo "Rodando programa..."
+$PY main.py
