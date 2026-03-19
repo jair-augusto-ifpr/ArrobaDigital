@@ -1,7 +1,7 @@
 import sqlite3
 
 def iniciar_banco():
-    conn == sqlite3.connect("cattle.db")
+    conn = sqlite3.connect("cattle.db")
     cursor = conn.cursor()
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS measurements (
@@ -15,10 +15,10 @@ def iniciar_banco():
     conn.commit()
     conn.close()
     
- def salvar_registro(peso, area, comprimento):
-     conn = sqlite3.connect("cattle.db")\
-     cursor = conn.cursor()
-     cursor.execute("""
+def salvar_registro(peso, area, comprimento):
+    conn = sqlite3.connect("cattle.db")
+    cursor = conn.cursor()
+    cursor.execute("""
         INSERT INTO measurements (weight, area, length)
         VALUES (?, ?, ?)
     """, (peso, area, comprimento))
