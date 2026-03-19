@@ -1,0 +1,38 @@
+import logging
+from datetime import datetime
+from pathlib import Path
+
+log_dir = Path("logs")
+log_dir.mkdir(exist_ok=True)
+
+logging.basicConfig(
+    filename=log_dir / "system.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M",
+    encoding="utf-8"
+)
+
+logger = logging.getLogger(__name__)
+
+def log_system_start():
+    """Log system startup"""
+    logger.info("Sistema iniciado")
+
+def log_cattle_detected(count: int = 1):
+    """Log cattle detection"""
+    logger.info(f"Boi detectado (Total: {count})")
+
+def log_processing_time(duration: float):
+    """Log processing time"""
+    logger.info(f"Tempo de processamento: {duration:.2f}s")
+
+def log_error(error_message: str):
+    """Log system errors"""
+    logger.error(f"Erro do sistema: {error_message}")
+
+if __name__ == "__main__":
+    log_system_start()
+    log_cattle_detected(1)
+    log_processing_time(2.5)
+    log_error("Falha na conexão")
