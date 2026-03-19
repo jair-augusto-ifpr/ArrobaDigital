@@ -11,6 +11,8 @@ from src.utils.image_utils import improve_lighting, draw_boxes
 def main():
     camera = Capture()
 
+    scale = 0.5
+
     detector = YoloDetector(model_path)
 
     while True:
@@ -28,7 +30,7 @@ def main():
 
         segments = segment_cows(cows, frame)
 
-        measurements = extract_measurements(segments)
+        measurements = extract_measurements(segments,scale)
 
         weights = predict_weight(measurements)
         
