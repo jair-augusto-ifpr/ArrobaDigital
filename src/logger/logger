@@ -19,7 +19,7 @@ def log_system_start():
     """Log system startup"""
     logger.info("Sistema iniciado")
 
-def log_cattle_detected(count: int = 1):
+def log_cattle_detected(count: int = 0):
     """Log cattle detection"""
     logger.info(f"Boi detectado (Total: {count})")
 
@@ -33,6 +33,5 @@ def log_error(error_message: str):
 
 if __name__ == "__main__":
     log_system_start()
-    log_cattle_detected(1)
     log_processing_time(2.5)
     log_error("Falha na conexão")
