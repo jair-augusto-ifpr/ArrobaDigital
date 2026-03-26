@@ -8,3 +8,8 @@ __pycache__/
 *.log
 datasets/
 models/*.pt
+read_yaml_example.py
+.env
+datasets/images/*.jpg
+datasets/images/*.png
+datasets/images/*.jpeg
