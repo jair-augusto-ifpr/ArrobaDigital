@@ -9,16 +9,16 @@ from src.utils.image_utils import improve_lighting, draw_boxes
 
 
 def main():
-    camera = Capture()
+    camera = Capture().start()
 
     scale = 0.5
 
     detector = YoloDetector(model_path)
 
     while True:
-        frame = camera.get_frame()
+        ret, frame = camera.read()
 
-        if frame is None:
+        if not ret:
             print("Erro ao capturar frame")
             break
 
@@ -49,7 +49,7 @@ def main():
         if cv2.waitKey(1) == 27:
             break
 
-    camera.release()
+    camera.stop()
     cv2.destroyAllWindows()
 
 
