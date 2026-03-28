@@ -7,8 +7,8 @@ def extract_measurements(cow_segments, scale):
     for seg in cow_segments:
         h, w, _ = seg.shape
 
-        altura_real = h * scale
-        largura_real = w * scale
+        altura_real = (h * scale) / 100
+        largura_real = (w * scale) / 100
         area_real = altura_real * largura_real
 
         data = {

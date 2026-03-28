@@ -1,17 +1,21 @@
 import cv2
+import yaml
 
 from src.camera.capture import Capture
 from src.detection.yolo_detector import YoloDetector, model_path
 from src.segmentation.mask_segmenter import segment_cows
-from src.biometrics.measurements import extract_measurements
+from src.biometrics.measurements import extract_measurements, calculate_scale
 from src.weight_estimation.predictor import predict_weight
 from src.utils.image_utils import improve_lighting, draw_boxes
-
+from src.conversao.conversao import modelo_regressao
 
 def main():
     camera = Capture().start()
+    
+    with open("config.yaml", "r") as f:
+        config = yaml.safe_load(f)
 
-    scale = 0.5
+    scale = calculate_scale(dist_real_cm=config["scale"]["dist_real_cm"], dist_pixels=config["scale"]["dist_pixels"])
 
     detector = YoloDetector(model_path)
 
@@ -32,8 +36,15 @@ def main():
 
         measurements = extract_measurements(segments,scale)
 
-        weights = predict_weight(measurements)
-        
+        weights = []
+
+        for m in measurements:
+            resultado = modelo_regressao(
+                largura=m["largura_m"],
+                area_dorsal=m["area_m2"]
+            )
+            weights.append(resultado.peso_estimado)
+
         frame = draw_boxes(frame, cows)
 
         for i, box in enumerate(cows):
