@@ -1,21 +1,72 @@
+import cv2
+
+from src.camera.capture import Capture
+from src.detection.yolo_detector import YoloDetector, model_path
+from src.segmentation.mask_segmenter import segment_cows
+from src.biometrics.measurements import extract_measurements
+from src.weight_estimation.predictor import predict_weight
+from src.utils.image_utils import improve_lighting, draw_boxes, draw_masks
 from database import iniciar_banco, salvar_registro
 
-def processar_dados(peso, area, comprimento):
-    try:
-        salvar_registro(peso, area, comprimento)
-        return True
-    except Exception as e:
-        print(f"Erro no Armazenamento: {e}")
-        return False
 
-if __name__ == "__main__":
+def main():
+    camera = Capture()
+
+    
+    scale = 0.5
+
+    detector = YoloDetector(model_path)
+
     iniciar_banco()
 
-    peso_teste = 420.0
-    area_teste = 0.95
-    comp_teste = 1.75
+    while True:
+        frame = camera.get_frame()
 
-    print("Iniciando Armazenamento no Neon...")
+        if frame is None:
+            print("Erro ao capturar frame")
+            break
 
-    if processar_dados(peso_teste, area_teste, comp_teste):
-        print(f"Dados salvos {peso_teste}kg, {area_teste}m², {comp_teste}m")
+        frame = improve_lighting(frame)
+
+        results = detector.detect(frame)
+
+        
+        cows = detector.filter_cows(results)
+
+        
+        segments = segment_cows(cows, frame)
+
+        
+        measurements = extract_measurements(segments, scale)
+
+        weights = predict_weight(measurements)
+
+        
+        frame = draw_boxes(frame, cows)
+        frame = draw_masks(frame, segments)
+
+        for i, seg in enumerate(segments):
+            x1, y1, _, _ = seg["box"]
+
+            if i < len(weights) and i < len(measurements):
+                text = f"{weights[i]:.1f} kg"
+                cv2.putText(frame, text, (x1, y1 - 10),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+
+                salvar_registro(
+                    peso=weights[i],
+                    area=measurements[i]["area_cm2"],
+                    comprimento=measurements[i]["comprimento_cm"]
+                )
+
+        cv2.imshow("Detecção de Bois", frame)
+
+        if cv2.waitKey(1) == 27:
+            break
+
+    camera.release()
+    cv2.destroyAllWindows()
+
+
+if __name__ == "__main__":
+    main()
