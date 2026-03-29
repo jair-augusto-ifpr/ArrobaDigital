@@ -1,20 +1,17 @@
 import cv2
 
-from src.camera.capture import Capture
-from src.detection.yolo_detector import YoloDetector, model_path
-from src.segmentation.mask_segmenter import segment_cows
-from src.biometrics.measurements import extract_measurements
-from src.weight_estimation.predictor import predict_weight
-from src.utils.image_utils import improve_lighting, draw_boxes, draw_masks
+from camera.capture import Capture
+from yolo_detector import YoloDetector, model_path
+from mask_segmenter import segment_cows
+from measurements import extract_measurements
+from predictor import predict_weight
+from image_utils import improve_lighting, draw_boxes, draw_masks
 from database import iniciar_banco, salvar_registro
 
 
 def main():
     camera = Capture()
-
-    
     scale = 0.5
-
     detector = YoloDetector(model_path)
 
     iniciar_banco()
@@ -27,21 +24,12 @@ def main():
             break
 
         frame = improve_lighting(frame)
-
         results = detector.detect(frame)
-
-        
         cows = detector.filter_cows(results)
-
-        
         segments = segment_cows(cows, frame)
-
-        
         measurements = extract_measurements(segments, scale)
-
         weights = predict_weight(measurements)
 
-        
         frame = draw_boxes(frame, cows)
         frame = draw_masks(frame, segments)
 
