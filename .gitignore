@@ -5,6 +5,7 @@ __pycache__/
 *.pyd
 *.db
 *.sqlite3
+*.log
 datasets/
 models/*.pt
 read_yaml_example.py
