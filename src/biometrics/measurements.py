@@ -1,5 +1,5 @@
 import cv2
-import numpy as np
+
 
 def calculate_scale(dist_real_cm, dist_pixels):
     """
@@ -21,6 +21,7 @@ def extract_measurements(cow_segments, scale):
       - largura_px / cm           : eixo curto (largura do dorso/quadril)
       - contour                   : contorno para debug/visualização
     Conversão: valor_cm = valor_px * scale
+    Inclui também largura_m, area_m2, altura_cm/m (comprimento como proxy) para o pipeline legado.
     """
     measurements = []
 
@@ -30,6 +31,19 @@ def extract_measurements(cow_segments, scale):
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL,
                                        cv2.CHAIN_APPROX_SIMPLE)
         if not contours:
+            measurements.append({
+                "area_px": 0,
+                "comprimento_px": 0,
+                "largura_px": 0,
+                "area_cm2": 0,
+                "comprimento_cm": 0,
+                "largura_cm": 0,
+                "largura_m": 0,
+                "area_m2": 0,
+                "altura_cm": 0,
+                "altura_m": 0,
+                "contour": None,
+            })
             continue
 
         contour = max(contours, key=cv2.contourArea)
@@ -37,13 +51,18 @@ def extract_measurements(cow_segments, scale):
         area_px = cv2.contourArea(contour)
 
         rect = cv2.minAreaRect(contour)
-        (_, _), (w_px, h_px), angulo = rect
+        (_, _), (w_px, h_px), _ = rect
         comprimento_px = max(w_px, h_px)
         largura_px     = min(w_px, h_px)
 
         area_cm2       = area_px        * (scale ** 2)
         comprimento_cm = comprimento_px * scale
         largura_cm     = largura_px     * scale
+
+        largura_m = largura_cm / 100.0
+        area_m2 = area_cm2 / 10000.0
+        altura_cm = comprimento_cm
+        altura_m = comprimento_cm / 100.0
 
         print(
             f"[Medidas] "
@@ -60,6 +79,11 @@ def extract_measurements(cow_segments, scale):
             "area_cm2":       area_cm2,
             "comprimento_cm": comprimento_cm,
             "largura_cm":     largura_cm,
+
+            "largura_m":      largura_m,
+            "area_m2":        area_m2,
+            "altura_cm":      altura_cm,
+            "altura_m":       altura_m,
 
             "contour":        contour,
         })
