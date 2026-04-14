@@ -1,6 +1,6 @@
 from ultralytics import YOLO
 
-model_path = 'yolov8m.pt' 
+model_path = 'yolov8m-seg.pt'
 
 class YoloDetector:
     def __init__(self, model_path):
@@ -9,15 +9,23 @@ class YoloDetector:
     def detect(self, image):
         results = self.model(image)
         return results
-    
+
     def filter_cows(self, results):
+        """
+        Retorna lista de dicts {"box": ..., "mask": ...} para cada boi detectado.
+        Usa yolov8-seg, então masks estarão disponíveis quando o modelo suportar.
+        """
         cows = []
 
         for r in results:
-            for box in r.boxes:
+            boxes = r.boxes
+            masks = r.masks  # None se modelo não for seg
+
+            for i, box in enumerate(boxes):
                 cls = int(box.cls[0])
 
-                if cls == 19:  # cow
-                    cows.append(box)
+                if cls == 19:  # cow no COCO
+                    mask = masks[i] if masks is not None else None
+                    cows.append({"box": box, "mask": mask})
 
         return cows
