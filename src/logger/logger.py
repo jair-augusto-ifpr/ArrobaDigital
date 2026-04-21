@@ -10,26 +10,31 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
     datefmt="%Y-%m-%d %H:%M",
-    encoding="utf-8"
+    encoding="utf-8",
 )
 
 logger = logging.getLogger(__name__)
+
 
 def log_system_start():
     """Log system startup"""
     logger.info("Sistema iniciado")
 
+
 def log_cattle_detected(count: int = 0):
     """Log cattle detection"""
     logger.info(f"Boi detectado (Total: {count})")
+
 
 def log_processing_time(duration: float):
     """Log processing time"""
     logger.info(f"Tempo de processamento: {duration:.2f}s")
 
+
 def log_error(error_message: str):
     """Log system errors"""
     logger.error(f"Erro do sistema: {error_message}")
+
 
 if __name__ == "__main__":
     log_system_start()

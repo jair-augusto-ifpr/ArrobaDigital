@@ -25,7 +25,14 @@ ai_model:
   
 processing:
   # Filtro para ignorar se for bezerro ou animal muito pequeno
-  min_area_pixels: 50000 
+  min_area_pixels: 50000
+  # Limites em metros usados pelo pipeline (main.py). Ajuste conforme a escala.
+  min_largura_m: 0.1
+  min_area_m2: 0.02
+  # Confiança mínima para aceitar uma detecção do YOLO.
+  conf: 0.25
+  # Classes a exibir quando show_all estiver ativo (nomes COCO).
+  classes_interesse: ["cow"]
   # Espécie/Raça predominante para ajuste da fórmula de regressão
   breed_focus: "Nelore"
 
