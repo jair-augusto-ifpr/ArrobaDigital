@@ -1,0 +1,15 @@
+# Pesos reais (kg) das fotos em imgs_tests/.
+# Fornecidos pelo usuário (abril/2026). Usados como label em
+# batch_images.py --ground-truth imgs_tests/ground_truth.yaml
+#
+# Notas:
+#   - nelore.jpeg / nelore2.png: touros PO de foto de catálogo (estimativa ~).
+#   - nelore1200 / nelore1415: número no nome é o peso informado.
+#   - neloreb.png: bezerro (ainda em crescimento).
+
+pesos:
+  nelore.jpeg:      900
+  nelore2.png:      1100
+  nelore1200.webp:  1200
+  nelore1415.webp:  1415
+  neloreb.png:      70

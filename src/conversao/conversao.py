@@ -5,11 +5,24 @@ Dois modelos disponíveis:
   1. Regressão Linear  → Peso = 6.15 * largura + 0.019 * area + 70.8
   2. Biométrico (PT²)  → Peso = comprimento * perimetro_toracico² * K
 
-Erro esperado: 3% a 5%
+⚠️ SOBRE OS COEFICIENTES DA REGRESSÃO LINEAR
+-------------------------------------------
+Os coeficientes (6.15, 0.019, 70.8) são um PLACEHOLDER didático:
+foram ajustados grosseiramente para um lote pequeno de Nelore adultos
+no escopo do TCC ArrobaDigital (IFPR). Não devem ser usados como
+referência científica sem recalibração com dados do próprio rebanho.
+
+O modelo biométrico PT² é bibliograficamente mais robusto (veja Santos &
+Boin, 1996; Heinrichs et al., 1992 para gado leiteiro) e deve ser
+preferido SEMPRE que for possível medir perímetro torácico.
+
+Erro esperado (após calibração): 3% a 10% dependendo da qualidade das
+medidas extraídas por visão computacional.
 """
 
 from dataclasses import dataclass
 from enum import Enum
+from typing import Optional
 
 
 # ---------------------------------------------------------------------------
@@ -118,6 +131,48 @@ def modelo_biometrico(
         modelo=f"Biométrico PT² ({raca.name})",
         formula=formula,
     )
+
+
+# ---------------------------------------------------------------------------
+# Dispatcher: escolhe o melhor modelo disponível
+# ---------------------------------------------------------------------------
+def _raca_from_name(nome: Optional[str]) -> Raca:
+    """Converte nome (case-insensitive, ignora acentos básicos) em enum Raca."""
+    if not nome:
+        return Raca.NELORE
+    chave = nome.strip().upper().replace("Ç", "C").replace("Ê", "E")
+    mapping = {r.name: r for r in Raca}
+    if chave in mapping:
+        return mapping[chave]
+    # Aliases comuns que a LLM pode devolver:
+    alias = {
+        "CRUZADO": Raca.CRUZAMENTO,
+        "ANELORADO": Raca.NELORE,
+        "BRAHMA": Raca.BRAHMAN,
+    }
+    return alias.get(chave, Raca.NELORE)
+
+
+def estimar_peso(
+    largura: float,
+    area_dorsal: float,
+    comprimento: Optional[float] = None,
+    perimetro_toracico: Optional[float] = None,
+    raca: Optional[str] = None,
+) -> ResultadoPeso:
+    """Escolhe automaticamente o melhor modelo.
+
+    - Se `comprimento` e `perimetro_toracico` forem fornecidos (>0) usa PT².
+    - Caso contrário, cai no modelo de regressão linear (placeholder).
+    - `raca` é string (como vem da análise visual). Default: Nelore.
+    """
+    if comprimento and perimetro_toracico and comprimento > 0 and perimetro_toracico > 0:
+        return modelo_biometrico(
+            comprimento=comprimento,
+            perimetro_toracico=perimetro_toracico,
+            raca=_raca_from_name(raca),
+        )
+    return modelo_regressao(largura=largura, area_dorsal=area_dorsal)
 
 
 # ---------------------------------------------------------------------------

@@ -1,4 +1,7 @@
 venv/
+.venv/
+.venv-debug/
+Ultralytics/
 __pycache__/
 *.pyc
 *.pyo
@@ -6,10 +9,8 @@ __pycache__/
 *.db
 *.sqlite3
 *.log
-datasets/
+.pytest_cache/
+captures/
 models/*.pt
-read_yaml_example.py
+yolov8*.pt
 .env
-datasets/images/*.jpg
-datasets/images/*.png
-datasets/images/*.jpeg
